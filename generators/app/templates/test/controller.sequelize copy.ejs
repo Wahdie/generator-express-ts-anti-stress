@@ -1,0 +1,55 @@
+import request from 'supertest';
+import app from '../../src/app';
+
+
+
+
+
+describe('<%= modelName %> Controller', () => {
+  let createdId: string;
+
+  const payload = {
+    <% modelFields.forEach(field => { %>
+    <%= field.name %>: <%= field.fakeValue %>,
+    <% }); %>
+  };
+
+  it('should create a new <%= modelName.toLowerCase() %>', async () => {
+    const res = await request(app)
+      .post('/<%= modelName.toLowerCase() %>')
+      .send(payload);
+    expect(res.statusCode).toBe(201);
+    expect(res.body).toHaveProperty('id');
+    createdId = res.body.id;
+  });
+
+  it('should get all <%= modelName.toLowerCase() %>s', async () => {
+    const res = await request(app).get('/<%= modelName.toLowerCase() %>');
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+  });
+
+  it('should get a single <%= modelName.toLowerCase() %>', async () => {
+    const res = await request(app).get(`/ <%= modelName.toLowerCase() %>/${createdId}`);
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('id', createdId);
+  });
+
+  it('should update the <%= modelName.toLowerCase() %>', async () => {
+    const update = {
+      <% modelFields.slice(0, 1).forEach(field => { %>
+      <%= field.name %>: <%= field.updatedFakeValue %>,
+      <% }); %>
+    };
+    const res = await request(app)
+      .put(`/ <%= modelName.toLowerCase() %>/${createdId}`)
+      .send(update);
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('should delete the <%= modelName.toLowerCase() %>', async () => {
+    const res = await request(app)
+      .delete(`/ <%= modelName.toLowerCase() %>/${createdId}`);
+    expect(res.statusCode).toBe(204);
+  });
+});

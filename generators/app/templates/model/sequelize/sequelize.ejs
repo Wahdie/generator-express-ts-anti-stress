@@ -1,0 +1,34 @@
+import { DataTypes, Model } from 'sequelize';
+import sequelize from '../config/database';
+
+export interface I<%= model.name %> {
+      <% Object.entries(model.fields).forEach(([fieldName, fieldAttributes]) => { %>
+        <%= fieldName %><%= fieldAttributes.required ? '' : '?' %>: <%= mapFieldType(fieldAttributes) %>;
+      <% }); %>
+}      
+
+
+class <%= model.name %> extends Model<I<%- model.name %>> implements I<%- model.name %> {
+<% Object.entries(model.fields).forEach(([fieldName, fieldAttributes]) => { %>
+  declare <%= fieldName %><%= fieldAttributes.required ? '' : '?' %>: <%= mapFieldType(fieldAttributes) %>;
+<% }) %>
+}
+
+<%= model.name %>.init(
+  {
+<% Object.entries(model.fields).forEach(([fieldName, fieldAttributes]) => { %>
+  <%- include('./field.ejs', { fieldName, fieldAttributes }) %>
+<% }) %>
+  },
+  {
+    sequelize,
+    modelName: '<%= model.name.toLowerCase() %>',
+    <%- model.timestamps === false ? 'timestamps: false,' : 'timestamps: true,' %>
+    <%- model.paranoid ? 'paranoid: true,' : '' %>
+    <%- model.name ? `tableName: '${model.name.toLowerCase()}s',` : '' %>
+    <%- model.underscored ? 'underscored: true,' : '' %>
+    freezeTableName: true
+  }
+);
+
+export default <%= model.name %>;

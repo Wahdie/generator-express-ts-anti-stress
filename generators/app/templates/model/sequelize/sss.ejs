@@ -1,0 +1,226 @@
+<% models.forEach(model => { %>import <%- model.name %> from './<%- model.name %>';
+<% }); %>
+
+<% models.forEach(model => {
+  if (model.relations) {
+    Object.entries(model.relations).forEach(([relationName, relation]) => {
+      const relatedModel = relation.model;
+      const relationOptions = [];
+
+      if (relation.foreignKey) {
+        relationOptions.push(`foreignKey: '${relation.foreignKey}'`);
+      } else {
+        relationOptions.push(`foreignKey: '${relatedModel.toLowerCase()}Id'`);
+      }
+
+      if (relation.as) {
+        relationOptions.push(`as: '${relation.as}'`);
+      }
+
+      if (relation.onDelete) {
+        relationOptions.push(`onDelete: '${relation.onDelete}'`);
+      }
+
+      if (relation.onUpdate) {
+        relationOptions.push(`onUpdate: '${relation.onUpdate}'`);
+      }
+
+      if (relation.constraints === false) {
+        relationOptions.push(`constraints: false`);
+      }
+
+      if (relation.hooks === true) {
+        relationOptions.push(`hooks: true`);
+      }
+
+      if (relation.sourceKey) {
+        relationOptions.push(`sourceKey: '${relation.sourceKey}'`);
+      }
+
+      if (relation.targetKey) {
+        relationOptions.push(`targetKey: '${relation.targetKey}'`);
+      }
+
+      if (relation.otherKey) {
+        relationOptions.push(`otherKey: '${relation.otherKey}'`);
+      }
+
+      if (relation.through) {
+        relationOptions.push(`through: '${relation.through}'`);
+      }
+%>
+<% if (relation.type === 'hasMany') { %>
+<%- model.name %>.hasMany(<%- relatedModel %>, {
+  <%- relationOptions.join(',\n  ') %>
+});
+<% } else if (relation.type === 'belongsTo') { %>
+<%- model.name %>.belongsTo(<%- relatedModel %>, {
+  <%- relationOptions.join(',\n  ') %>
+});
+<% } else if (relation.type === 'hasOne') { %>
+<%- model.name %>.hasOne(<%- relatedModel %>, {
+  <%- relationOptions.join(',\n  ') %>
+});
+<% } else if (relation.type === 'belongsToMany' || relation.type === 'manyToMany') { %>
+<%- model.name %>.belongsToMany(<%- relatedModel %>, {
+  <%- relationOptions.join(',\n  ') %>
+});
+<% } %>
+<% }); } }); %>
+
+export {
+<% models.forEach((model, index) => { %><%- model.name %><%- index < models.length - 1 ? ',' : '' %><% }); %>
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<% models.forEach(model => { %>import <%= model.name %> from './<%= model.name %>';
+<% }); %>
+
+<% models.forEach(model => {
+  if (model.relations) {
+    Object.entries(model.relations).forEach(([relationName, relation]) => {
+      const relatedModel = relation.model;
+      const relationOptions = [];
+
+      if (relation.foreignKey) {
+        relationOptions.push(`foreignKey: '${relation.foreignKey}'`);
+      } else {
+        relationOptions.push(`foreignKey: '${model.name.toLowerCase()}Id'`);
+      }
+
+      if (relation.as) {
+        relationOptions.push(`as: '${relation.as}'`);
+      }
+
+      if (relation.onDelete) {
+        relationOptions.push(`onDelete: '${relation.onDelete}'`);
+      }
+
+      if (relation.onUpdate) {
+        relationOptions.push(`onUpdate: '${relation.onUpdate}'`);
+      }
+
+      if (relation.constraints === false) {
+        relationOptions.push(`constraints: false`);
+      }
+
+      if (relation.hooks === true) {
+        relationOptions.push(`hooks: true`);
+      }
+
+      if (relation.sourceKey) {
+        relationOptions.push(`sourceKey: '${relation.sourceKey}'`);
+      }
+
+      if (relation.targetKey) {
+        relationOptions.push(`targetKey: '${relation.targetKey}'`);
+      }
+
+      if (relation.otherKey) {
+        relationOptions.push(`otherKey: '${relation.otherKey}'`);
+      }
+
+      if (relation.through) {
+        relationOptions.push(`through: '${relation.through}'`);
+      }
+%>
+<% if (relation.type === 'hasMany') { %>
+<%= model.name %>.hasMany(<%= relatedModel %>, {
+  <%= relationOptions.join(',\n  ') %>
+});
+<% } else if (relation.type === 'belongsTo') { %>
+<%= model.name %>.belongsTo(<%= relatedModel %>, {
+  <%= relationOptions.join(',\n  ') %>
+});
+<% } else if (relation.type === 'hasOne') { %>
+<%= model.name %>.hasOne(<%= relatedModel %>, {
+  <%= relationOptions.join(',\n  ') %>
+});
+<% } else if (relation.type === 'belongsToMany') { %>
+<%= model.name %>.belongsToMany(<%= relatedModel %>, {
+  <%= relationOptions.join(',\n  ') %>
+});
+<% } %>
+<% }); } }); %>
+
+export {
+<% models.forEach((model, index) => { %>
+  <%= model.name %><%= index < models.length - 1 ? ',' : '' %>
+<% }); %>
+};
+
+
+
+<% models.forEach(model => { %>import <%= model.name %> from './<%= model.name %>';
+<% }); %>
+
+<% models.forEach(model => {
+  if (model.relations) {
+    Object.entries(model.relations).forEach(([relationName, relation]) => {
+      const options = [];
+      const relatedModel = relation.model;
+      
+      // Set foreign key - use specified or generate default
+      const fkOption = relation.foreignKey || 
+                      (relation.type === 'belongsTo' ? `${relationName}Id` : `${model.name.toLowerCase()}Id`);
+      options.push(`foreignKey: '${fkOption}'`);
+      
+      // Handle cascade options
+      if (relation.cascadeDelete) {
+        options.push(`onDelete: 'CASCADE'`);
+      }
+      if (relation.onDelete) {
+        options.push(`onDelete: '${relation.onDelete}'`);
+      }
+      if (relation.onUpdate) {
+        options.push(`onUpdate: '${relation.onUpdate}'`);
+      }
+      
+      // Handle through tables for many-to-many
+      if (relation.through) {
+        options.push(`through: '${relation.through}'`);
+      }
+      
+      // Map relation types
+      const sequelizeRelationType = 
+        relation.type === 'manyToMany' ? 'belongsToMany' : 
+        relation.type;
+%>
+<% if (sequelizeRelationType === 'hasMany') { %>
+<%= model.name %>.hasMany(<%= relatedModel %>, {
+  <%= options.join(',\n  ') %>
+});
+<% } else if (sequelizeRelationType === 'belongsTo') { %>
+<%= model.name %>.belongsTo(<%= relatedModel %>, {
+  <%= options.join(',\n  ') %>
+});
+<% } else if (sequelizeRelationType === 'hasOne') { %>
+<%= model.name %>.hasOne(<%= relatedModel %>, {
+  <%= options.join(',\n  ') %>
+});
+<% } else if (sequelizeRelationType === 'belongsToMany') { %>
+<%= model.name %>.belongsToMany(<%= relatedModel %>, {
+  <%= options.join(',\n  ') %>
+});
+<% } %>
+<% }); } }); %>
+
+export {
+<% models.forEach((model, index) => { %>
+  <%= model.name %><%= index < models.length - 1 ? ',' : '' %>
+<% }); %>
+};
+
+
